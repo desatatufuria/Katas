@@ -10,6 +10,8 @@
 
   Metodología
   --
+ El Reto ha sido resuelto como un proyecto de consola en c#  
+  
  He creado una clase [CesarCipher] que contiene dos métodos: [encrypt] y [decrypt]
   
  Para controlar las excepciones he creado un array de caracteres [excludedChars] que contiene las letras que no se cifrarán.

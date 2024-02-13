@@ -1,5 +1,8 @@
-using System;
+﻿using System;
+using System.ComponentModel.Design;
 using System.Linq;
+
+
 
 /* Challenge 1 (23/24) - Cifrado Cesar
  * 
@@ -18,6 +21,22 @@ using System.Linq;
  * Se puede probar el codigo introduciendo una mensaje y una clave de desplazamiento para cifrarlo y descifrarlo.
  * o bien se puede probar el test unitario basico que he creado para comprobar que el cifrado y descifrado funciona correctamente.
  * 
+ * EJEMPLOS DE USO:
+ *       
+ * Como Clase en un proyecto:
+ * 
+ *       Cipher.encrypt("zizu", 2); // se espera [bkxb]
+ *       Cipher.decrypt("bkxb", 2); // se espera [zizu]
+ *       
+ * Como comando en linea de Consola (CLI):
+ * 
+ *       ChipherCesar.exe [sin argumentos] // se muestra el menu
+ *       
+ *       ChipherCesar.exe encrypt zizu, 2  // se espera [bkxb]
+ *       
+ *       ChipherCesar.exe decrypt bkxb, 2  // se espera [zizu]
+ *
+ * 
  */
 
 class Program
@@ -25,27 +44,130 @@ class Program
 {
     static void Main(string[] args)
     {
-        CesarCipher Cipher = new CesarCipher();
-        string msg = "En criptografía, el cifrado Cesar, tambien conocido como cifrado por desplazamiento," +
-                       " código de Cesar o desplazamiento de Cesar, es una de las técnicas de cifrado mas simples y mas usadas";
-                      
-        string msgEncrypt = "Gp etkrvqitchkc, gn ekhtcfq Eguct, vcodkgp eqpqekfq eqoq ekhtcfq rqt fgurncbcokgpvq," +
-                       " eqfkiq fg Eguct q fgurncbcokgpvq fg Eguct, gu wpc fg ncu vgepkecu fg ekhtcfq ocu ukorngu a ocu wucfcu";
+        switch (args.Length)
+        {
+            case 0:
+                // No se han introducido argumentos por lo que se muestra el menu
+                showMenu();
+                break;
+            case 3:
+                // Se han introducido 3 argumentos por lo que se procede a comprobar si se quiere cifrar o descifrar
+                if ((args[0] == "encrypt" || args[0] == "decrypt") && args.Length >= 3)
+                {
+                    // Comprobamos que la clave sea un numero entero positivo
+                    if (int.TryParse(args[2], out int key) && key >= 0)
+                    {
+                        // Creamos una instancia de la clase CesarCipher
+                        CesarCipher Cipher = new CesarCipher();
+                        // Comprobamos si se quiere cifrar o descifrar
+                        if (args[0] == "encrypt")
+                            Cipher.encrypt(args[1], key); // ciframos el mensaje
+                        else
+                            Cipher.decrypt(args[1], key); // desciframos el mensaje
+                    }
+                    else
+                        Console.WriteLine("La clave debe ser un numero entero positivo"); // si la clave no es valida
+                }
+                else
+                    help(); // si los argumentos no son validos mostramos la ayuda
 
-
-        Cipher.encrypt(msg, 2); // se espera [msgEncrypt]
-        Cipher.decrypt(msgEncrypt, 2); // se espera [msg]
-        
-        Cipher.encrypt("zizu", 2); // se espera [bkxb]
-        Cipher.decrypt("bkxb", 2); // se espera [zizu]
-
-        
-        Cipher.encrypt("supercalifragilisticoespialidoso", 20); // se espera [mojylwufczluacfcmncwiymjcufcximi]
-        Cipher.decrypt("mojylwufczluacfcmncwiymjcufcximi", 20); // se espera [supercalifragilisticoespialidoso]
-
-
+                break;
+            default:
+                help(); // si el numero de argumentos no es valido mostramos la ayuda
+                break;
+        }
+    }
+    public static void help()
+    {
+        Console.WriteLine("\n\nInstrucciones: ");
+        Console.WriteLine("--------------");
+        Console.WriteLine("Para encriptar: ChipherCesar.exe encrypt [texto] [clave]");
+        Console.WriteLine("Para desencriptar: ChipherCesar.exe decrypt [textoEncriptado] [clave]");
+        Console.WriteLine("Si quieres ver el menu: ChipherCesar.exe");
+        Console.WriteLine("-- Enter para salir.");
         Console.ReadKey();
 
+    }
+
+    public static void showMenu()
+    {
+
+        CesarCipher Cipher = new CesarCipher();
+
+        while (true)
+        {
+            Console.Clear();
+            Console.WriteLine("\n\n Seleccione una opción:");
+            Console.WriteLine("\r\r 1. Cifrar mensaje");
+            Console.WriteLine("\r\r 2. Descifrar mensaje");
+            Console.WriteLine("\r\r 3. Test Unitario Básico");
+            Console.WriteLine("\r\r x. Salir");
+
+            string opcion = Console.ReadLine();
+
+            switch (opcion)
+            {
+                case "1":
+                    Console.Clear();
+                    // Introducir mensaje [sin cifrar]
+                    Console.Write("Ingrese el mensaje a cifrar:");
+                    string msg = Console.ReadLine();
+
+                    // Introducir clave de desplazamiento
+                    Console.Write("Ingrese la clave:");
+                    int keyEncrypt = int.Parse(Console.ReadLine());
+
+                    // cifrar mensaje
+                    Console.Write("Mensaje cifrado: ");
+                    Cipher.encrypt(msg, keyEncrypt);
+                    Console.ReadKey();
+                    break;
+                case "2":
+                    Console.Clear();
+                    // Introducir mensaje [cifrado]
+                    Console.WriteLine("Ingrese el mensaje a descifrar:");
+                    string msgDecrypt = Console.ReadLine();
+
+                    // Introducir clave de desplazamiento
+                    Console.WriteLine("Ingrese la clave:");
+                    int keyDecrypt = int.Parse(Console.ReadLine());
+
+                    // descifrar mensaje
+                    Console.Write("Mensaje descifrado: ");
+                    Cipher.decrypt(msgDecrypt, keyDecrypt);
+                    Console.ReadKey();
+                    break;
+                case "3":
+                    Console.Clear();
+                    string msgTest = "En criptografía, el cifrado Cesar, tambien conocido como cifrado por desplazamiento," +
+                                   " código de Cesar o desplazamiento de Cesar, es una de las técnicas de cifrado mas simples y mas usadas";
+
+                    string msgTestEncrypt = "Hq fulswrjudild, ho fliudgr Fhvdu, wdpelhq frqrflgr frpr fliudgr sru ghvsodcdplhqwr, frgljr gh " +
+                        "Fhvdu r ghvsodcdplhqwr gh Fhvdu, hv xqd gh odv whfqlfdv gh fliudgr pdv vlpsohv b pdv xvdgdv";
+
+
+                    int keyUnitTest = 3;
+                    // Mensaje original
+                    Console.WriteLine($"\n\n Mensaje original:\n\n {msgTest}");
+
+                    // Mensaje cifrado
+                    Console.WriteLine($"\n\n Mensaje cifrado con desplazamiento {keyUnitTest} :\n\n");
+                    Cipher.encrypt(msgTest, keyUnitTest);
+
+                    // Mensaje descifrado
+                    Console.WriteLine($"\n\n Mensaje descifrado con desplazamiento {keyUnitTest} :\n\n");
+                    Cipher.decrypt(msgTestEncrypt, keyUnitTest);
+                    Console.ReadKey();
+                    break;
+                case "x":
+                case "X":
+                    // Salir
+                    return;
+                default:
+                    Console.WriteLine("Por favor, seleccione una opción válida.");
+                    break;
+            }
+        }
     }
 
     public class CesarCipher
@@ -59,7 +181,7 @@ class Program
             msg = replaceChars(msg);
 
             // caracteres que no se cifran
-            char[] excludedChars = { 'ñ', 'Ñ'};
+            char[] excludedChars = { 'ñ', 'Ñ' };
 
             // recorremos cada letra del mensaje
             foreach (char c in msg)
@@ -87,13 +209,13 @@ class Program
             }
             Console.WriteLine(result);
         }
-        
+
         // El metodo [decrypt] es simplemente el metodo [encrypt] pero con la clave negativa
         public void decrypt(string msg, int key)
         {
             encrypt(msg, -key);
         }
-        
+
         private string replaceChars(string msg)
         {
             return msg
@@ -103,5 +225,7 @@ class Program
                   .Replace('ó', 'o').Replace('Ó', 'O')
                   .Replace('ú', 'u').Replace('Ú', 'U');
         }
+
     }
+
 }

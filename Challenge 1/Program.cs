@@ -1,23 +1,24 @@
 ﻿using System;
 using System.Linq;
+using static System.Net.Mime.MediaTypeNames;
 
 
-/* Challenge 1 (23/24) - Cifrado César
+/* Challenge 1 (23/24) - Cifrado Cesar
  * 
- * Crea un programa que realize el cifrado César de un texto y lo imprima.
- * También debe ser capaz de descifrarlo cuando así se lo indiquemos.
+ * Crea un programa que realize el cifrado Cesar de un texto y lo imprima.
+ * Tambien debe ser capaz de descifrarlo cuando asi se lo indiquemos.
  *
- * Te recomiendo que busques información para conocer en profundidad cómo
- * realizar el cifrado. Esto también forma parte del reto.
+ * Te recomiendo que busques informacion para conocer en profundidad como
+ * realizar el cifrado. Esto tambien forma parte del reto.
  * 
  * 
- * La metodología que he seguido ha sido crear una clase [CesarCipher] que contiene dos métodos: [encrypt] y [decrypt]
+ * La metodologia que he seguido ha sido crear una clase [CesarCipher] que contiene dos metodos: [encrypt] y [decrypt]
  * 
- * Para controlar las excepciones he creado un array de caracteres [excludedChars] que contiene las letras que no se cifrarán.
- * incluyendo las letras con tilde y la letra ñ tanto en mayúsculas como en minúsculas.
+ * Para controlar las excepciones he creado un array de caracteres [excludedChars] que contiene las letras que no se cifraran.
+ * incluyendo las letras con tilde y la letra n tanto en mayusculas como en minusculas.
  * 
  * Se puede probar el codigo introduciendo una mensaje y una clave de desplazamiento para cifrarlo y descifrarlo.
- * o bien se puede probar el test unitario básico que he creado para comprobar que el cifrado y descifrado funciona correctamente.
+ * o bien se puede probar el test unitario basico que he creado para comprobar que el cifrado y descifrado funciona correctamente.
  * 
  */
 
@@ -27,122 +28,82 @@ class Program
     static void Main(string[] args)
     {
         CesarCipher Cipher = new CesarCipher();
+        string msg = "En criptografía, el cifrado Cesar, tambien conocido como cifrado por desplazamiento," +
+                       " código de Cesar o desplazamiento de Cesar, es una de las técnicas de cifrado mas simples y mas usadas";
+                      
+        string msgEncrypt = "Gp etkrvqitchkc, gn ekhtcfq Eguct, vcodkgp eqpqekfq eqoq ekhtcfq rqt fgurncbcokgpvq," +
+                       " eqfkiq fg Eguct q fgurncbcokgpvq fg Eguct, gu wpc fg ncu vgepkecu fg ekhtcfq ocu ukorngu a ocu wucfcu";
 
 
-        while (true)
-        {
-            Console.Clear();
-            Console.WriteLine("\n\n Seleccione una opción:");
-            Console.WriteLine("\r\r 1. Cifrar mensaje");
-            Console.WriteLine("\r\r 2. Descifrar mensaje");
-            Console.WriteLine("\r\r 3. Test Unitario Básico");
-            Console.WriteLine("\r\r x. Salir");
+        Cipher.encrypt(msg, 2); // se espera [msgEncrypt]
+        Cipher.decrypt(msgEncrypt, 2); // se espera [msg]
+        
+        Cipher.encrypt("zizu", 2); // se espera [bkxb]
+        Cipher.decrypt("bkxb", 2); // se espera [zizu]
 
-            string opcion = Console.ReadLine();
-
-            switch (opcion)
-            {
-                case "1":
-                    Console.Clear();
-                    // Introducir mensaje [sin cifrar]
-                    Console.Write("Ingrese el mensaje a cifrar:");
-                    string msg = Console.ReadLine();
-
-                    // Introducir clave de desplazamiento
-                    Console.Write("Ingrese la clave:");
-                    int keyEncrypt = int.Parse(Console.ReadLine());
-
-                    // cifrar mensaje
-                    string msgEncrypt = Cipher.encrypt(msg, keyEncrypt);
-                    Console.WriteLine("Mensaje cifrado: " + msgEncrypt);
-                    Console.ReadKey();
-                    break;
-                case "2":
-                    Console.Clear();
-                    // Introducir mensaje [cifrado]
-                    Console.WriteLine("Ingrese el mensaje a descifrar:");
-                    string msgDecrypt = Console.ReadLine();
-
-                    // Introducir clave de desplazamiento
-                    Console.WriteLine("Ingrese la clave:");
-                    int keyDecrypt = int.Parse(Console.ReadLine());
-
-                    // descifrar mensaje
-                    string decryptMsg = Cipher.decrypt(msgDecrypt, keyDecrypt);
-                    Console.WriteLine("Mensaje descifrado: " + decryptMsg);
-                    Console.ReadKey();
-                    break;
-                case "3":
-                    Console.Clear();
-                    string msgUnitTest = "En criptografía, el cifrado César, también conocido como cifrado por desplazamiento," +
-                        " código de César o desplazamiento de César, es una de las técnicas de cifrado más simples y más usadas." +
-                        " Es un tipo de cifrado por sustitución en el que una letra en el texto original es reemplazada por otra " +
-                        "letra que se encuentra un número fijo de posiciones más adelante en el alfabeto.";
+        
+        Cipher.encrypt("supercalifragilisticoespialidoso", 20); // se espera [mojylwufczluacfcmncwiymjcufcximi]
+        Cipher.decrypt("mojylwufczluacfcmncwiymjcufcximi", 20); // se espera [supercalifragilisticoespialidoso]
 
 
-                    int keyUnitTest = 3;
-                    string msgEncryptUnitTest = Cipher.encrypt(msgUnitTest, keyUnitTest);
-                    string msgDecryptUnitTest = Cipher.decrypt(msgEncryptUnitTest, keyUnitTest);
+        Console.ReadKey();
 
-                    Console.WriteLine($"\n\n Mensaje original:\n\n {msgUnitTest}");
-                    Console.WriteLine($"\n\n Mensaje cifrado con desplazamiento {keyUnitTest} :\n\n {msgEncryptUnitTest}");
-                    Console.WriteLine($"\n\n Mensaje descifrado con desplazamiento {keyUnitTest} :\n\n {msgDecryptUnitTest}");
-                    Console.ReadKey();
-                    break;
-
-
-                case "x":
-                case "X":
-                    Console.WriteLine("Saliendo del programa...");
-                    return;
-                default:
-                    Console.WriteLine("Opción no válida. Por favor, seleccione una opción válida.");
-                    break;
-            }
-        }
     }
 
     public class CesarCipher
     {
-        public string encrypt(string msg, int key)
+        public void encrypt(string msg, int key)
         {
             // variable para almacenar el mensaje cifrado
             string result = "";
-            // caracteres que no se cifrarán
-            char[] excludedChars = { 'Ñ', 'ñ', 'á', 'é', 'í', 'ó', 'ú', 'Á', 'É', 'Í', 'Ó', 'Ú' };
+
+            // reemplazar caracteres especiales
+            msg = replaceChars(msg);
 
             // recorremos cada letra del mensaje
             foreach (char c in msg)
             {
                 // si no es una letra o es una de las letras '<ñ> o <Ñ>' se devuelve tal cual
-                if (!char.IsLetter(c) || excludedChars.Contains(c))
+                if (!char.IsLetter(c))
                 {
                     result += c;
                     continue;
                 }
-                // obtener si es mayúscula o minúscula para obtener el índice del código ASCII desde donde desplazaremos cada letra 
+                // obtener si es mayuscula o minuscula para obtener el indice del codigo ASCII desde donde desplazaremos cada letra 
                 char CharInit = char.IsUpper(c) ? 'A' : 'a';
 
                 // indice de la letra [c] restando el codigo ASCII desde [A] o [a] 
                 int Index = (int)c - (int)CharInit;
                 /* 
-                 * Fórmula aplicada por el método Cesar.(extraída de Wikipedia)  
-                 * el modulo 26 es para que si [index] se pasa de la 'z' o 'Z' vuelva a empezar desde la 'a' o 'A' según sea el caso
+                 * Formula aplicada por el metodo Cesar.(extraida de Wikipedia)  
+                 * el modulo 26 es para que si [index] se pasa de la 'z' o 'Z' vuelva a empezar desde la 'a' o 'A' segun sea el caso
                  */
                 int newIndex = (Index + key + 26) % 26;
 
-                // obtenemos el nuevo código ASCII ya convertido de la letra desplazada [c]
+                // obtenemos el nuevo codigo ASCII ya convertido de la letra desplazada [c]
                 char AsciiChar = (char)(newIndex + CharInit);
                 result += AsciiChar;
             }
-            return result;
+            Console.WriteLine(result);
         }
 
-        // El método [decrypt] es simplemente el método [encrypt] pero con la clave negativa
-        public string decrypt(string msg, int key)
+        // El metodo [decrypt] es simplemente el metodo [encrypt] pero con la clave negativa
+        public void decrypt(string msg, int key)
         {
-            return encrypt(msg, -key);
+            encrypt(msg, -key);
         }
+
+        private string replaceChars(string msg)
+        {
+            return msg
+                  .Replace('á', 'a').Replace('Á', 'A')
+                  .Replace('é', 'e').Replace('É', 'E')
+                  .Replace('í', 'i').Replace('Í', 'I')
+                  .Replace('ó', 'o').Replace('Ó', 'O')
+                  .Replace('ú', 'u').Replace('Ú', 'U')
+                  .Replace('ñ', 'n').Replace('Ñ', 'N');
+        }
+
     }
 
 }

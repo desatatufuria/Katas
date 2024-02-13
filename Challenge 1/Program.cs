@@ -1,7 +1,5 @@
-﻿using System;
+using System;
 using System.Linq;
-using static System.Net.Mime.MediaTypeNames;
-
 
 /* Challenge 1 (23/24) - Cifrado Cesar
  * 
@@ -60,11 +58,14 @@ class Program
             // reemplazar caracteres especiales
             msg = replaceChars(msg);
 
+            // caracteres que no se cifran
+            char[] excludedChars = { 'ñ', 'Ñ'};
+
             // recorremos cada letra del mensaje
             foreach (char c in msg)
             {
                 // si no es una letra o es una de las letras '<ñ> o <Ñ>' se devuelve tal cual
-                if (!char.IsLetter(c))
+                if (!char.IsLetter(c) || excludedChars.Contains(c))
                 {
                     result += c;
                     continue;
@@ -86,13 +87,13 @@ class Program
             }
             Console.WriteLine(result);
         }
-
+        
         // El metodo [decrypt] es simplemente el metodo [encrypt] pero con la clave negativa
         public void decrypt(string msg, int key)
         {
             encrypt(msg, -key);
         }
-
+        
         private string replaceChars(string msg)
         {
             return msg
@@ -100,10 +101,7 @@ class Program
                   .Replace('é', 'e').Replace('É', 'E')
                   .Replace('í', 'i').Replace('Í', 'I')
                   .Replace('ó', 'o').Replace('Ó', 'O')
-                  .Replace('ú', 'u').Replace('Ú', 'U')
-                  .Replace('ñ', 'n').Replace('Ñ', 'N');
+                  .Replace('ú', 'u').Replace('Ú', 'U');
         }
-
     }
-
 }
